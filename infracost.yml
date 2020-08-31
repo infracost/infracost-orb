@@ -6,7 +6,7 @@ aliases:
     run:
       name: Download infracost
       command: |
-        curl -L https://github.com/aliscott/infracost/releases/download/<<parameters.infracost_version>>/infracost-linux-amd64.tar.gz -o infracost.tar.gz \
+        curl -L https://github.com/aliscott/infracost/releases/<<parameters.infracost_version>>/download/infracost-linux-amd64.tar.gz -o infracost.tar.gz \
           && tar -xvf infracost.tar.gz
   - &step_download_terraform
     run:
