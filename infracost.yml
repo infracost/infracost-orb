@@ -73,7 +73,7 @@ commands:
         type: string
         default: terraform/
     steps:
-      - run: terraform init <<parameters.terraform_file_directory>>
+      - run: cd <<parameters.terraform_file_directory>> && terraform init
       - run: ./infracost-linux-amd64 --tfplan <<parameters.terraform_plan_file>> --tfdir <<parameters.terraform_file_directory>>
   save-infracost-json:
     parameters:
@@ -84,7 +84,7 @@ commands:
         type: string
         default: terraform/
     steps:
-      - run: terraform init <<parameters.terraform_file_directory>>
+      - run: cd <<parameters.terraform_file_directory>> && terraform init
       - run: mkdir -p /tmp/infracost/
       - run: ./infracost-linux-amd64 --tfplan <<parameters.terraform_plan_file>> --tfdir <<parameters.terraform_file_directory>> > /tmp/infracost/infracost.json
       - persist_to_workspace:
