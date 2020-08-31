@@ -86,7 +86,7 @@ commands:
     steps:
       - run: cd <<parameters.terraform_file_directory>> && terraform init
       - run: mkdir -p /tmp/infracost/
-      - run: ./infracost-linux-amd64 --tfplan <<parameters.terraform_plan_file>> --tfdir <<parameters.terraform_file_directory>> > /tmp/infracost/infracost.json
+      - run: ./infracost-linux-amd64 -o json --tfplan <<parameters.terraform_plan_file>> --tfdir <<parameters.terraform_file_directory>> > /tmp/infracost/infracost.json
       - persist_to_workspace:
           root: /tmp/infracost
           paths: infracost.json
