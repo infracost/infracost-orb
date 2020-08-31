@@ -1,0 +1,8 @@
+version: 2.1
+orbs:
+  infracost: sashman/infracost@dev:1
+
+workflows:
+  "Test Workflow":
+    jobs:
+      - infracost/my_inline_job
