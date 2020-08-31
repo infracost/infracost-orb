@@ -50,6 +50,9 @@ jobs:
       terraform_file_directory:
         type: string
         default: terraform/
+      infracost_report_directory:
+        type: string
+        default: /tmp/infracost/
     steps:
       - checkout
       - download-infracost
@@ -83,10 +86,13 @@ commands:
       terraform_file_directory:
         type: string
         default: terraform/
+      infracost_report_directory:
+        type: string
+        default: /tmp/infracost/
     steps:
       - run: cd <<parameters.terraform_file_directory>> && terraform init
-      - run: mkdir -p /tmp/infracost/
-      - run: ./infracost-linux-amd64 -o json --tfplan <<parameters.terraform_plan_file>> --tfdir <<parameters.terraform_file_directory>> > /tmp/infracost/infracost.json
+      - run: mkdir -p <<parameters.infracost_report_directory>>
+      - run: ./infracost-linux-amd64 -o json --tfplan <<parameters.terraform_plan_file>> --tfdir <<parameters.terraform_file_directory>> > <<parameters.infracost_report_directory>>infracost.json
       - persist_to_workspace:
-          root: /tmp/infracost
+          root: <<parameters.infracost_report_directory>>
           paths: infracost.json
