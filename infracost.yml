@@ -1,6 +1,21 @@
 version: "2.1"
 description: "An orb wrapper for the infracost CLI tool"
 
+aliases:
+  - &step_download_infracost
+    run:
+      name: Download infracost
+      command: |
+        curl -L https://github.com/aliscott/infracost/releases/download/<<parameters.infracost_version>>/infracost-linux-amd64.tar.gz -o infracost.tar.gz \
+          && tar -xvf infracost.tar.gz
+  - &step_download_terraform
+    run:
+      name: Download terraform
+      command: |
+        curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add - \
+          && sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main" \
+          && sudo apt-get update && sudo apt-get install terraform
+
 orbs:
   infracost:
     executors:
@@ -25,27 +40,14 @@ orbs:
           infracost_version:
             type: string
             default: v0.4.1
-          # terraform_plan_file:
-          #   type: string
-          # terraform_file_directory:
-          #   type: string
+          terraform_plan_file:
+            type: string
+          terraform_file_directory:
+            type: string
         steps:
-          - run: |
-              curl -L https://github.com/aliscott/infracost/releases/download/<<parameters.infracost_version>>/infracost-linux-amd64.tar.gz -o infracost.tar.gz \
-                && tar -xvf infracost.tar.gz
-          - run: |
-              curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add - \
-                && sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main" \
-                && sudo apt-get update && sudo apt-get install terraform
-          - run: mkdir -p terraform
-          - run: |
-              curl https://raw.githubusercontent.com/aliscott/infracost/master/examples/small_terraform/main.tf -o terraform/main.tf \
-                && curl https://raw.githubusercontent.com/aliscott/infracost/master/examples/small_terraform/data.tf -o terraform/data.tf \
-                && cd terraform \
-                && terraform init \
-                && terraform plan -out plan.save
-          - run: ./infracost-linux-amd64 --tfplan plan.save --tfdir terraform/
-          # - run: ./infracost-linux-amd64 --tfplan <<parameters.terraform_plan_file>> --tfdir <<parameters.terraform_file_directory>>
+          - *step_download_infracost
+          - *step_download_terraform
+          - run: ./infracost-linux-amd64 --tfplan <<parameters.terraform_plan_file>> --tfdir <<parameters.terraform_file_directory>>
 
 workflows:
   build-test-deploy:
