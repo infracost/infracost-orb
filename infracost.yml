@@ -23,9 +23,7 @@ orbs:
         docker:
           - image: cimg/base:2020.01
     jobs:
-      run-infracost:
-        environment:
-          AWS_DEFAULT_REGION: us-east-1
+      run-infracost-report:
         parameters:
           infracost_version:
             description: Version of infracost release
@@ -33,24 +31,28 @@ orbs:
             default: v0.4.1
         executor: infracost_executor
         steps:
-          - run-infracost
+          - download-infracost
+          - run-infracost-report
     commands:
-      run-infracost:
+      download-infracost:
         parameters:
           infracost_version:
             type: string
             default: v0.4.1
+        steps:
+          - *step_download_infracost
+          - *step_download_terraform
+      run-infracost-report:
+        parameters:
           terraform_plan_file:
             type: string
           terraform_file_directory:
             type: string
         steps:
-          - *step_download_infracost
-          - *step_download_terraform
           - run: ./infracost-linux-amd64 --tfplan <<parameters.terraform_plan_file>> --tfdir <<parameters.terraform_file_directory>>
 
 workflows:
-  build-test-deploy:
+  build:
     jobs:
-      - infracost/run-infracost:
+      - infracost/run-infracost-report:
           name: run
