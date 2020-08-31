@@ -35,6 +35,7 @@ jobs:
         type: string
         default: terraform/
     steps:
+      - checkout
       - download-infracost
       - run-infracost-report
   save-infracost-json:
@@ -50,6 +51,7 @@ jobs:
         type: string
         default: terraform/
     steps:
+      - checkout
       - download-infracost
       - save-infracost-json
 
