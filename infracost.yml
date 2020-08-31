@@ -16,57 +16,49 @@ aliases:
           && sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main" \
           && sudo apt-get update && sudo apt-get install terraform
 
-orbs:
-  infracost:
-    executors:
-      infracost_executor:
-        docker:
-          - image: cimg/base:2020.01
-    jobs:
-      run-infracost-report:
-        executor: infracost_executor
-        steps:
-          - download-infracost
-          - run-infracost-report
-      save-infracost-json:
-        executor: infracost_executor
-        steps:
-          - download-infracost
-          - save-infracost-json
-    commands:
-      download-infracost:
-        parameters:
-          infracost_version:
-            type: string
-            default: v0.4.1
-        steps:
-          - *step_download_infracost
-          - *step_download_terraform
-      run-infracost-report:
-        parameters:
-          terraform_plan_file:
-            type: string
-          terraform_file_directory:
-            type: string
-        steps:
-          - run: ./infracost-linux-amd64 --tfplan <<parameters.terraform_plan_file>> --tfdir <<parameters.terraform_file_directory>>
-      save-infracost-json:
-        parameters:
-          terraform_plan_file:
-            type: string
-          terraform_file_directory:
-            type: string
-        steps:
-          - run: mkdir -p /tmp/infracost/
-          - run: ./infracost-linux-amd64 --tfplan <<parameters.terraform_plan_file>> --tfdir <<parameters.terraform_file_directory>> > /tmp/infracost/infracost.json
-          - persist_to_workspace:
-              root: /tmp/infracost
-              paths: infracost.json
+executors:
+  infracost_executor:
+    docker:
+      - image: cimg/base:2020.01
 
-workflows:
-  build:
-    jobs:
-      - infracost/run-infracost-report:
-          name: run
-      - infracost/save-infracost-json:
-          name: json
+jobs:
+  run-infracost-report:
+    executor: infracost_executor
+    steps:
+      - download-infracost
+      - run-infracost-report
+  save-infracost-json:
+    executor: infracost_executor
+    steps:
+      - download-infracost
+      - save-infracost-json
+
+commands:
+  download-infracost:
+    parameters:
+      infracost_version:
+        type: string
+        default: latest
+    steps:
+      - *step_download_infracost
+      - *step_download_terraform
+  run-infracost-report:
+    parameters:
+      terraform_plan_file:
+        type: string
+      terraform_file_directory:
+        type: string
+    steps:
+      - run: ./infracost-linux-amd64 --tfplan <<parameters.terraform_plan_file>> --tfdir <<parameters.terraform_file_directory>>
+  save-infracost-json:
+    parameters:
+      terraform_plan_file:
+        type: string
+      terraform_file_directory:
+        type: string
+    steps:
+      - run: mkdir -p /tmp/infracost/
+      - run: ./infracost-linux-amd64 --tfplan <<parameters.terraform_plan_file>> --tfdir <<parameters.terraform_file_directory>> > /tmp/infracost/infracost.json
+      - persist_to_workspace:
+          root: /tmp/infracost
+          paths: infracost.json
