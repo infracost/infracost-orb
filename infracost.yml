@@ -15,6 +15,22 @@ aliases:
         curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add - \
           && sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main" \
           && sudo apt-get update && sudo apt-get install terraform
+  - &infracost_version_param
+    type: string
+    default: latest
+    description: The version of the infracost executable to use
+  - &terraform_plan_file_param
+    type: string
+    default: plan.save
+    description: The filename of the Terraform plan
+  - &terraform_file_directory_param
+    type: string
+    default: terraform/
+    description: The root directory of your terraform file
+  - &infracost_report_directory_param
+    type: string
+    default: /tmp/infracost/
+    description: The CircleCI workspace directory where to persist the `infracost.json` JSON report. Use `attach_workspace` to access the report.
 
 executors:
   infracost_executor:
@@ -25,15 +41,9 @@ jobs:
   run-infracost-report:
     executor: infracost_executor
     parameters:
-      infracost_version:
-        type: string
-        default: latest
-      terraform_plan_file:
-        type: string
-        default: plan.save
-      terraform_file_directory:
-        type: string
-        default: terraform/
+      infracost_version: *infracost_version_param
+      terraform_plan_file: *terraform_plan_file_param
+      terraform_file_directory: *terraform_file_directory_param
     steps:
       - checkout
       - download-infracost
@@ -41,18 +51,10 @@ jobs:
   save-infracost-json:
     executor: infracost_executor
     parameters:
-      infracost_version:
-        type: string
-        default: latest
-      terraform_plan_file:
-        type: string
-        default: plan.save
-      terraform_file_directory:
-        type: string
-        default: terraform/
-      infracost_report_directory:
-        type: string
-        default: /tmp/infracost/
+      infracost_version: *infracost_version_param
+      terraform_plan_file: *terraform_plan_file_param
+      terraform_file_directory: *terraform_file_directory_param
+      infracost_report_directory: *infracost_report_directory_param
     steps:
       - checkout
       - download-infracost
@@ -61,34 +63,22 @@ jobs:
 commands:
   download-infracost:
     parameters:
-      infracost_version:
-        type: string
-        default: latest
+      infracost_version: *infracost_version_param
     steps:
       - *step_download_infracost
       - *step_download_terraform
   run-infracost-report:
     parameters:
-      terraform_plan_file:
-        type: string
-        default: plan.save
-      terraform_file_directory:
-        type: string
-        default: terraform/
+      terraform_plan_file: *terraform_plan_file_param
+      terraform_file_directory: *terraform_file_directory_param
     steps:
       - run: cd <<parameters.terraform_file_directory>> && terraform init
       - run: ./infracost-linux-amd64 --tfplan <<parameters.terraform_plan_file>> --tfdir <<parameters.terraform_file_directory>>
   save-infracost-json:
     parameters:
-      terraform_plan_file:
-        type: string
-        default: plan.save
-      terraform_file_directory:
-        type: string
-        default: terraform/
-      infracost_report_directory:
-        type: string
-        default: /tmp/infracost/
+      terraform_plan_file: *terraform_plan_file_param
+      terraform_file_directory: *terraform_file_directory_param
+      infracost_report_directory: *infracost_report_directory_param
     steps:
       - run: cd <<parameters.terraform_file_directory>> && terraform init
       - run: mkdir -p <<parameters.infracost_report_directory>>
@@ -96,3 +86,34 @@ commands:
       - persist_to_workspace:
           root: <<parameters.infracost_report_directory>>
           paths: infracost.json
+
+examples:
+  print_and_parse_report:
+    description: Run a tabular report and parse the saved JSON output, this example the plan file is already committed to the repository
+    usage:
+      version: 2.1
+      orbs:
+        infracost: sashman/infracost@0.0.6
+      jobs:
+        read-report:
+          docker:
+            - image: endeveit/docker-jq
+          steps:
+            - attach_workspace:
+                at: ~/report
+            - run:
+                name: Read JSON report
+                command: cat ~/report/infracost.json | jq
+      workflows:
+        print_and_parse_report:
+          jobs:
+            - infracost/run-infracost-report:
+                terraform_plan_file: plan.save
+                terraform_file_directory: terraform/
+            - infracost/save-infracost-json:
+                terraform_plan_file: plan.save
+                terraform_file_directory: terraform/
+                infracost_report_directory: ~/report
+            - read-report:
+                requires:
+                  - infracost/save-infracost-json
