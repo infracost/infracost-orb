@@ -1,7 +1,7 @@
 version: "2.1"
 description: "An orb wrapper for the infracost CLI tool"
 display:
-  source_url: https://github.com/sashman/infracost-orb
+  source_url: https://github.com/infracost/infracost-orb
 
 aliases:
   - &step_download_infracost
@@ -95,7 +95,7 @@ examples:
     usage:
       version: 2.1
       orbs:
-        infracost: sashman/infracost@0.0.6
+        infracost: infracost/infracost@0.0.6
       jobs:
         read-report:
           docker:
