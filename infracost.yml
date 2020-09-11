@@ -4,23 +4,6 @@ display:
   source_url: https://github.com/infracost/infracost-orb
 
 aliases:
-  - &step_download_infracost
-    run:
-      name: Download infracost
-      command: |
-        curl -L https://github.com/aliscott/infracost/releases/<<parameters.infracost_version>>/download/infracost-linux-amd64.tar.gz -o infracost.tar.gz \
-          && tar -xvf infracost.tar.gz
-  - &step_download_terraform
-    run:
-      name: Download terraform
-      command: |
-        curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add - \
-          && sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main" \
-          && sudo apt-get update && sudo apt-get install terraform
-  - &infracost_version_param
-    type: string
-    default: latest
-    description: The version of the infracost executable to use
   - &terraform_plan_file_param
     type: string
     default: plan.save
@@ -37,45 +20,35 @@ aliases:
 executors:
   infracost_executor:
     docker:
-      - image: cimg/base:2020.01
+      - image: infracost/infracost:latest
 
 jobs:
   run-infracost-report:
     executor: infracost_executor
     parameters:
-      infracost_version: *infracost_version_param
       terraform_plan_file: *terraform_plan_file_param
       terraform_file_directory: *terraform_file_directory_param
     steps:
       - checkout
-      - download-infracost
       - run-infracost-report
   save-infracost-json:
     executor: infracost_executor
     parameters:
-      infracost_version: *infracost_version_param
       terraform_plan_file: *terraform_plan_file_param
       terraform_file_directory: *terraform_file_directory_param
       infracost_report_directory: *infracost_report_directory_param
     steps:
       - checkout
-      - download-infracost
       - save-infracost-json
 
 commands:
-  download-infracost:
-    parameters:
-      infracost_version: *infracost_version_param
-    steps:
-      - *step_download_infracost
-      - *step_download_terraform
   run-infracost-report:
     parameters:
       terraform_plan_file: *terraform_plan_file_param
       terraform_file_directory: *terraform_file_directory_param
     steps:
       - run: cd <<parameters.terraform_file_directory>> && terraform init
-      - run: ./infracost-linux-amd64 --tfplan <<parameters.terraform_plan_file>> --tfdir <<parameters.terraform_file_directory>>
+      - run: infracost --tfplan <<parameters.terraform_plan_file>> --tfdir <<parameters.terraform_file_directory>>
   save-infracost-json:
     parameters:
       terraform_plan_file: *terraform_plan_file_param
@@ -84,7 +57,7 @@ commands:
     steps:
       - run: cd <<parameters.terraform_file_directory>> && terraform init
       - run: mkdir -p <<parameters.infracost_report_directory>>
-      - run: ./infracost-linux-amd64 -o json --tfplan <<parameters.terraform_plan_file>> --tfdir <<parameters.terraform_file_directory>> > <<parameters.infracost_report_directory>>infracost.json
+      - run: infracost -o json --tfplan <<parameters.terraform_plan_file>> --tfdir <<parameters.terraform_file_directory>> > <<parameters.infracost_report_directory>>infracost.json
       - persist_to_workspace:
           root: <<parameters.infracost_report_directory>>
           paths: infracost.json
