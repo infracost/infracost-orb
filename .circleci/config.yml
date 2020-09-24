@@ -1,14 +1,25 @@
 version: "2.1"
 orbs:
   orb-tools: circleci/orb-tools@10
+# Pipeline parameters
+parameters:
+  # These pipeline parameters are required by the "trigger-integration-tests-workflow"
+  # job, by default.
+  run-integration-tests:
+    type: boolean
+    default: false
+  dev-orb-version:
+    type: string
+    default: "dev:alpha"
 jobs:
-  integration-tests-for-your-orb:
-    executor: orb-tools/ubuntu
-    steps:
-      - checkout
+  # integration-tests-for-your-orb:
+  #   executor: orb-tools/ubuntu
+  #   steps:
+  #     - checkout
 workflows:
   integration-test_deploy:
     jobs:
+      # - integration-tests-for-your-orb
       - orb-tools/dev-promote-prod-from-commit-subject:
           add-pr-comment: false
           fail-if-semver-not-indicated: false
@@ -21,13 +32,11 @@ workflows:
   test-pack:
     jobs:
       - orb-tools/lint
-      - orb-tools/shellcheck
       - orb-tools/pack
       - orb-tools/publish-dev:
           orb-name: infracost/infracost
           requires:
             - orb-tools/lint
-            - orb-tools/shellcheck
             - orb-tools/pack
       - orb-tools/trigger-integration-tests-workflow:
           name: trigger-integration-dev
