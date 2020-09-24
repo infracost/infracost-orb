@@ -1,13 +1,36 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine. See: https://circleci.com/docs/2.0/configuration-reference
-version: 2.1
-# Use a package of configuration called an orb.
+version: "2.1"
 orbs:
-  # Declare a dependency on the welcome-orb
-  welcome: circleci/welcome-orb@0.4.1
-# Orchestrate or schedule a set of jobs
+  orb-tools: circleci/orb-tools@10
+jobs:
+  integration-tests-for-your-orb:
+    executor: orb-tools/ubuntu
+    steps:
+      - checkout
 workflows:
-  # Name the workflow "welcome"
-  welcome:
-    # Run the welcome/run job in its own container
+  integration-test_deploy:
     jobs:
-      - welcome/run
+      - orb-tools/dev-promote-prod-from-commit-subject:
+          add-pr-comment: false
+          fail-if-semver-not-indicated: false
+          filters:
+            branches:
+              only: master
+          orb-name: infracost/infracost
+          publish-version-tag: false
+    when: << pipeline.parameters.run-integration-tests >>
+  test-pack:
+    jobs:
+      - orb-tools/lint
+      - orb-tools/shellcheck
+      - orb-tools/pack
+      - orb-tools/publish-dev:
+          orb-name: infracost/infracost
+          requires:
+            - orb-tools/lint
+            - orb-tools/shellcheck
+            - orb-tools/pack
+      - orb-tools/trigger-integration-tests-workflow:
+          name: trigger-integration-dev
+          requires:
+            - orb-tools/publish-dev
+    unless: << pipeline.parameters.run-integration-tests >>
