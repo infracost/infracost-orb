@@ -3,7 +3,7 @@ CircleCI orb for using the infracost CLI tool
 
 ## Repository
 
-https://circleci.com/orbs/registry/orb/sashman/infracost
+https://circleci.com/developer/orbs/orb/infracost/infracost
 
 ## Publishing
 
