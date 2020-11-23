@@ -4,10 +4,6 @@ display:
   source_url: https://github.com/infracost/infracost-orb
 
 aliases:
-  - &terraform_plan_file_param
-    type: string
-    default: plan.save
-    description: The filename of the Terraform plan
   - &terraform_file_directory_param
     type: string
     default: terraform/
@@ -26,7 +22,6 @@ jobs:
   run-infracost-report:
     executor: infracost_executor
     parameters:
-      terraform_plan_file: *terraform_plan_file_param
       terraform_file_directory: *terraform_file_directory_param
     steps:
       - checkout
@@ -34,7 +29,6 @@ jobs:
   save-infracost-json:
     executor: infracost_executor
     parameters:
-      terraform_plan_file: *terraform_plan_file_param
       terraform_file_directory: *terraform_file_directory_param
       infracost_report_directory: *infracost_report_directory_param
     steps:
@@ -44,23 +38,9 @@ jobs:
 commands:
   run-infracost-report:
     parameters:
-      terraform_plan_file: *terraform_plan_file_param
       terraform_file_directory: *terraform_file_directory_param
     steps:
-      - run: cd <<parameters.terraform_file_directory>> && terraform init
-      - run: infracost --tfplan <<parameters.terraform_plan_file>> --tfdir <<parameters.terraform_file_directory>>
-  save-infracost-json:
-    parameters:
-      terraform_plan_file: *terraform_plan_file_param
-      terraform_file_directory: *terraform_file_directory_param
-      infracost_report_directory: *infracost_report_directory_param
-    steps:
-      - run: cd <<parameters.terraform_file_directory>> && terraform init
-      - run: mkdir -p <<parameters.infracost_report_directory>>
-      - run: infracost -o json --tfplan <<parameters.terraform_plan_file>> --tfdir <<parameters.terraform_file_directory>> > <<parameters.infracost_report_directory>>infracost.json
-      - persist_to_workspace:
-          root: <<parameters.infracost_report_directory>>
-          paths: infracost.json
+      - run: infracost --tfdir <<parameters.terraform_file_directory>>
 
 examples:
   print_and_parse_report:
