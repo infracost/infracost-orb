@@ -3,10 +3,13 @@ description: "An orb wrapper for the infracost CLI tool"
 display:
   source_url: https://github.com/infracost/infracost-orb
 
-commands:
-  run-infracost-report:
+executors:
+  infracost_executor:
     docker:
       - image: infracost/infracost:latest
+
+commands:
+  run-infracost:
     parameters:
       tfdir:
         type: string
