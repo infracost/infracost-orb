@@ -33,26 +33,3 @@ commands:
       terraform_file_directory: *terraform_file_directory_param
     steps:
       - run: infracost --tfdir <<parameters.terraform_file_directory>>
-
-examples:
-  print_and_parse_report:
-    description: Run a tabular report and parse the saved JSON output, this example the plan file is already committed to the repository, it's recommended you run plan to create the report as part of this workflow.
-    usage:
-      version: 2.1
-      orbs:
-        infracost: infracost/infracost@0.0.6
-      jobs:
-        read-report:
-          docker:
-            - image: endeveit/docker-jq
-          steps:
-            - attach_workspace:
-                at: ~/report
-            - run:
-                name: Read JSON report
-                command: cat ~/report/infracost.json | jq
-      workflows:
-        print_and_parse_report:
-          jobs:
-            - infracost/run-infracost-report:
-                terraform_file_directory: terraform/
