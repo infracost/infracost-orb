@@ -8,10 +8,6 @@ aliases:
     type: string
     default: terraform/
     description: The root directory of your terraform file
-  - &infracost_report_directory_param
-    type: string
-    default: /tmp/infracost/
-    description: The CircleCI workspace directory where to persist the `infracost.json` JSON report. Use `attach_workspace` to access the report.
 
 executors:
   infracost_executor:
