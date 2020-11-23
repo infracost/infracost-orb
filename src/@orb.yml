@@ -9,7 +9,7 @@ executors:
       - image: infracost/infracost:latest
 
 commands:
-  run-infracost:
+  run_infracost:
     parameters:
       tfdir:
         type: string
