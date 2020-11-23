@@ -2,19 +2,13 @@ version: 2.1
 description: "An orb wrapper for the infracost CLI tool"
 display:
   source_url: https://github.com/infracost/infracost-orb
-
-executors:
-  infracost_executor:
-    docker:
-      - image: infracost/infracost:latest
-
-commands:
-  run_infracost:
-    parameters:
-      tfdir:
-        type: string
-        default: .
-        description: The root directory of your terraform file
-    steps:
-      - checkout
-      - run: infracost --tfdir <<parameters.tfdir>>
+docker:
+  - image: infracost/infracost:latest
+parameters:
+  tfdir:
+    type: string
+    default: .
+    description: The root directory of your terraform file
+steps:
+  - checkout
+  - run: infracost --tfdir <<parameters.tfdir>>
