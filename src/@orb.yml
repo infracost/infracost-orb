@@ -26,14 +26,6 @@ jobs:
     steps:
       - checkout
       - run-infracost-report
-  save-infracost-json:
-    executor: infracost_executor
-    parameters:
-      terraform_file_directory: *terraform_file_directory_param
-      infracost_report_directory: *infracost_report_directory_param
-    steps:
-      - checkout
-      - save-infracost-json
 
 commands:
   run-infracost-report:
@@ -63,12 +55,4 @@ examples:
         print_and_parse_report:
           jobs:
             - infracost/run-infracost-report:
-                terraform_plan_file: plan.save
                 terraform_file_directory: terraform/
-            - infracost/save-infracost-json:
-                terraform_plan_file: plan.save
-                terraform_file_directory: terraform/
-                infracost_report_directory: ~/report
-            - read-report:
-                requires:
-                  - infracost/save-infracost-json
