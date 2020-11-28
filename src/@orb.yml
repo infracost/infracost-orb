@@ -1,16 +1,63 @@
 version: 2.1
-description: "An orb wrapper for the infracost CLI tool"
+description: "Show cloud cost estimate changes from Terraform in pull requests."
 display:
+  home_url: https://www.infracost.io/docs/
   source_url: https://github.com/infracost/infracost-orb
 jobs:
   infracost:
     docker:
-      - image: infracost/infracost:latest
+      - image: infracost/infracost:test
     parameters:
-      tfdir:
+      tfjson:
+        description: Path to Terraform plan JSON file.
+        default: ""
         type: string
-        default: .
-        description: The root directory of your terraform file
+      tfplan:
+        description: Path to Terraform plan file relative to 'tfdir'. Requires 'tfdir' to be set.
+        default: ""
+        type: string
+      use_tfstate:
+        description: Use Terraform state instead of generating a plan.
+        default: "false"
+        type: string
+      tfdir:
+        description: Path to the Terraform code directory (default is current working directory).
+        default: "."
+        type: string
+      tfflags:
+        description: Flags to pass to the 'terraform plan' command.
+        default: ""
+        type: string
+      percentage_threshold:
+        description: The absolute percentage threshold that triggers a pull request comment with the diff. Defaults to 0, meaning that a comment is posted if the cost estimate changes. For example, set to 5 to post a comment if the cost estimate changes by plus or minus 5%.
+        default: "0"
+        type: string
+      pricing_api_endpoint:
+        description: Specify an alternate price list API URL (default is https://pricing.api.infracost.io).
+        default: ""
+        type: string
+    environment:
+      tfjson: << parameters.tfjson >>
+      tfplan: << parameters.tfplan >>
+      use_tfstate: << parameters.use_tfstate >>
+      tfdir: << parameters.tfdir >>
+      tfflags: << parameters.tfflags >>
+      percentage_threshold: << parameters.percentage_threshold >>
+      pricing_api_endpoint: << parameters.pricing_api_endpoint >>
     steps:
       - checkout
-      - run: infracost --tfdir <<parameters.tfdir>>
+      - run: /scripts/ci/diff.sh
+
+examples:
+  infracost:
+    description: Show cloud cost estimate changes from Terraform in pull requests.
+    usage:
+      version: 2.1
+      orbs:
+        infracost: infracost/infracost@0.1.0
+      workflows:
+        main:
+          jobs:
+            - infracost/infracost:
+                tfdir: PATH/TO/CODE
+                tfflags: -var-file=myvars.tfvars
