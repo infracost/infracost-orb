@@ -1,74 +1,63 @@
 version: 2.1
-description: "An orb wrapper for the infracost CLI tool"
+description: "Show cloud cost estimate changes from Terraform in pull requests."
 display:
+  home_url: https://www.infracost.io
   source_url: https://github.com/infracost/infracost-orb
-
-aliases:
-  - &terraform_file_directory_param
-    type: string
-    default: terraform/
-    description: The root directory of your terraform file
-  - &infracost_report_directory_param
-    type: string
-    default: /tmp/infracost/
-    description: The CircleCI workspace directory where to persist the `infracost.json` JSON report. Use `attach_workspace` to access the report.
-
-executors:
-  infracost_executor:
-    docker:
-      - image: infracost/infracost:latest
-
 jobs:
-  run-infracost-report:
-    executor: infracost_executor
+  infracost:
+    docker:
+      - image: infracost/infracost:test
     parameters:
-      terraform_file_directory: *terraform_file_directory_param
+      tfjson:
+        description: Path to Terraform plan JSON file.
+        default: ""
+        type: string
+      tfplan:
+        description: Path to Terraform plan file relative to 'tfdir'. Requires 'tfdir' to be set.
+        default: ""
+        type: string
+      use_tfstate:
+        description: Use Terraform state instead of generating a plan.
+        default: "false"
+        type: string
+      tfdir:
+        description: Path to the Terraform code directory (default is current working directory).
+        default: "."
+        type: string
+      tfflags:
+        description: Flags to pass to the 'terraform plan' command.
+        default: ""
+        type: string
+      percentage_threshold:
+        description: The absolute percentage threshold that triggers a pull request comment with the diff. Defaults to 0, meaning that a comment is posted if the cost estimate changes. For example, set to 5 to post a comment if the cost estimate changes by plus or minus 5%.
+        default: "0"
+        type: string
+      pricing_api_endpoint:
+        description: Specify an alternate price list API URL (default is https://pricing.api.infracost.io).
+        default: ""
+        type: string
+    environment:
+      tfjson: << parameters.tfjson >>
+      tfplan: << parameters.tfplan >>
+      use_tfstate: << parameters.use_tfstate >>
+      tfdir: << parameters.tfdir >>
+      tfflags: << parameters.tfflags >>
+      percentage_threshold: << parameters.percentage_threshold >>
+      pricing_api_endpoint: << parameters.pricing_api_endpoint >>
     steps:
       - checkout
-      - run-infracost-report
-  save-infracost-json:
-    executor: infracost_executor
-    parameters:
-      terraform_file_directory: *terraform_file_directory_param
-      infracost_report_directory: *infracost_report_directory_param
-    steps:
-      - checkout
-      - save-infracost-json
-
-commands:
-  run-infracost-report:
-    parameters:
-      terraform_file_directory: *terraform_file_directory_param
-    steps:
-      - run: infracost --tfdir <<parameters.terraform_file_directory>>
+      - run: /scripts/ci/diff.sh
 
 examples:
-  print_and_parse_report:
-    description: Run a tabular report and parse the saved JSON output, this example the plan file is already committed to the repository, it's recommended you run plan to create the report as part of this workflow.
+  infracost:
+    description: Show cloud cost estimate changes from Terraform in pull requests.
     usage:
       version: 2.1
       orbs:
-        infracost: infracost/infracost@0.0.6
-      jobs:
-        read-report:
-          docker:
-            - image: endeveit/docker-jq
-          steps:
-            - attach_workspace:
-                at: ~/report
-            - run:
-                name: Read JSON report
-                command: cat ~/report/infracost.json | jq
+        infracost: infracost/infracost@0.1.0
       workflows:
-        print_and_parse_report:
+        main:
           jobs:
-            - infracost/run-infracost-report:
-                terraform_plan_file: plan.save
-                terraform_file_directory: terraform/
-            - infracost/save-infracost-json:
-                terraform_plan_file: plan.save
-                terraform_file_directory: terraform/
-                infracost_report_directory: ~/report
-            - read-report:
-                requires:
-                  - infracost/save-infracost-json
+            - infracost/infracost:
+                tfdir: PATH/TO/CODE
+                tfflags: -var-file=myvars.tfvars
