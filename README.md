@@ -65,7 +65,7 @@ If the [Terraform directory method](https://www.infracost.io/docs/#1-terraform-d
   ```
   version: 2.1
   orbs:
-    infracost: infracost/infracost@0.1.0
+    infracost: infracost/infracost@0.3.0
   workflows:
     main:
       jobs:
