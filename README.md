@@ -2,7 +2,7 @@
 
 This [CircleCI Orb](https://circleci.com/developer/orbs/orb/infracost/infracost) runs [Infracost](https://infracost.io) against the master branch and the pull request whenever a Terraform file changes. It automatically adds a pull request comment showing the cost estimate difference (similar to `git diff`) if a percentage threshold is crossed.
 
-It supports GitHub and BitBucket; BitBucket does not show commit comments in the pull request view so you have to check the commit's comments.
+It supports GitHub and BitBucket; BitBucket does not show commit comments in the pull request view so you have to check the commit's comments to see the Infracost output.
 
 <img src="screenshot.png" width=557 alt="Example screenshot" />
 
@@ -54,7 +54,7 @@ If the [Terraform directory method](https://www.infracost.io/docs/#1-terraform-d
 
 ### `BITBUCKET_TOKEN`
 
-**Optional** BitBucket "username:password" used to post comments (e.g. "myusername:my_app_password"). Using a [BitBucket App password](https://support.atlassian.com/bitbucket-cloud/docs/app-passwords/) is recommended.
+**Optional** BitBucket "username:password" used to post comments (e.g. "myusername:my_app_password"), the password needs to have `repository` scope so it can post comments. Using a [BitBucket App password](https://support.atlassian.com/bitbucket-cloud/docs/app-passwords/) is recommended.
 
 ## Usage
 
@@ -80,7 +80,7 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 ## Publishing
 
-To publish Orb, you can amend the commit or push another commit with [semver:FOO] in the subject where FOO is major, minor, patch.
+To publish Orb, you can amend the commit or push another commit with [semver:FOO] in the subject where FOO is 'major', 'minor', or 'patch'. CircleCI will automatically bump the Orb version based on the semver commit.
 
 To indicate intention to skip promotion, include [semver:skip] in the commit subject instead.
 
