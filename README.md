@@ -2,7 +2,7 @@
 
 This [CircleCI Orb](https://circleci.com/developer/orbs/orb/infracost/infracost) runs [Infracost](https://infracost.io) against the master branch and the pull request whenever a Terraform file changes. It automatically adds a pull request comment showing the cost estimate difference (similar to `git diff`) if a percentage threshold is crossed.
 
-It supports GitHub and BitBucket; BitBucket does not show commit comments in the pull request view so you have to check the commit's comments to see the Infracost output.
+It supports GitHub and BitBucket; BitBucket does not show commit comments in the pull request page so you have to check the commit's comments page to see the Infracost output.
 
 <img src="screenshot.png" width=557 alt="Example screenshot" />
 
