@@ -46,7 +46,7 @@ The following environment variables are required. Other supported environment va
 
 If the [Terraform directory method](https://www.infracost.io/docs/#1-terraform-directory) is being used with AWS, `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` should be set.
 
-Terraform Cloud users who use Remote Execution Mode should follow [this section](https://www.infracost.io/docs/#terraform-cloud-users). Terragrunt users should follow [this section](https://www.infracost.io/docs/#terragrunt-users).
+Terraform Cloud users should follow [this section](https://www.infracost.io/docs/#terraform-cloud-users). Terragrunt users should follow [this section](https://www.infracost.io/docs/#terragrunt-users).
 
 ### `INFRACOST_API_KEY`
 
