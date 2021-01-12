@@ -36,6 +36,10 @@ jobs:
         description: Specify an alternate price list API URL (default is https://pricing.api.infracost.io).
         default: ""
         type: string
+      usage_file:
+        description: Path to Infracost usage file that specifies values for usage-based resources.
+        default: ""
+        type: string
     environment:
       tfjson: << parameters.tfjson >>
       tfplan: << parameters.tfplan >>
@@ -44,6 +48,7 @@ jobs:
       tfflags: << parameters.tfflags >>
       percentage_threshold: << parameters.percentage_threshold >>
       pricing_api_endpoint: << parameters.pricing_api_endpoint >>
+      usage_file: << parameters.usage_file >>
     steps:
       - checkout
       - run: /scripts/ci/diff.sh
@@ -54,10 +59,10 @@ examples:
     usage:
       version: 2.1
       orbs:
-        infracost: infracost/infracost@0.4.0
+        infracost: infracost/infracost@0.4.1
       workflows:
         main:
           jobs:
             - infracost/infracost:
-                tfdir: PATH/TO/CODE
+                tfdir: path/to/code
                 tfflags: -var-file=myvars.tfvars
