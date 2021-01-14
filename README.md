@@ -70,6 +70,10 @@ Terraform Cloud/Enterprise users should follow [this section](https://www.infrac
 
 **Optional** Bitbucket API URL, defaults to https://api.bitbucket.org.
 
+### `TERRAFORM_BINARY`
+
+**Optional** Used to change the path to the terraform binary or version, see [here](https://www.infracost.io/docs/environment_variables/#cicd-integrations) for the available options.
+
 ## Usage
 
 1. In CircleCI, go to your Project Settings > Environment Variables, and add environment variables for `INFRACOST_API_KEY`, either `GITHUB_TOKEN` or `BITBUCKET_TOKEN`, and any other required credentials (e.g. `AWS_ACCESS_KEY_ID`).
