@@ -1,5 +1,5 @@
 version: 2.1
-description: "Show cloud cost estimate changes from Terraform in pull requests."
+description: "Show cloud cost estimate changes for Terraform in pull requests."
 display:
   home_url: https://www.infracost.io
   source_url: https://github.com/infracost/infracost-orb
@@ -55,7 +55,7 @@ jobs:
 
 examples:
   infracost:
-    description: Show cloud cost estimate changes from Terraform in pull requests.
+    description: Show cloud cost estimate changes for Terraform in pull requests.
     usage:
       version: 2.1
       orbs:
