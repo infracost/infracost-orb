@@ -14,11 +14,11 @@ As mentioned in the [FAQ](https://www.infracost.io/docs/faq), you can run Infrac
 
 Infracost should be run using the [Terraform directory method](https://www.infracost.io/docs/#1-terraform-directory) with this CircleCI Orb. Once [this issue](https://github.com/infracost/infracost/issues/99) is released, we'll be able to support other methods.
 
-### `tfdir`
+### `terraform_dir`
 
 **Optional** Path to the Terraform code directory (default is current working directory).
 
-### `tfflags`
+### `terraform_plan_flags`
 
 **Optional** Flags to pass to the 'terraform plan' command, e.g. `"-var-file=myvars.tfvars -var-file=othervars.tfvars"`.
 
@@ -32,7 +32,7 @@ Infracost should be run using the [Terraform directory method](https://www.infra
 
 ### `pricing_api_endpoint`
 
-**Optional** Specify an alternate price list API URL (default is https://pricing.api.infracost.io).
+**Optional** Specify an alternate Cloud Pricing API URL (default is https://pricing.api.infracost.io).
 
 ## Environment variables
 
@@ -60,7 +60,7 @@ For all other users, the following is needed so Terraform can run `init`:
 - AWS users should set `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
 - GCP users should set `GOOGLE_CREDENTIALS` or read [this section](https://registry.terraform.io/providers/hashicorp/google/latest/docs/guides/provider_reference#full-reference) of the Terraform docs for other options.
 
-### `TERRAFORM_BINARY`
+### `INFRACOST_TERRAFORM_BINARY`
 
 **Optional** Used to change the path to the terraform binary or version, see [here](https://www.infracost.io/docs/environment_variables/#cicd-integrations) for the available options.
 
@@ -76,7 +76,7 @@ For all other users, the following is needed so Terraform can run `init`:
 
 1. In CircleCI, go to your Project Settings > Environment Variables, and add environment variables for `INFRACOST_API_KEY`, either `GITHUB_TOKEN` or `BITBUCKET_TOKEN`, and any other required credentials (e.g. `AWS_ACCESS_KEY_ID`).
 
-2. Create a new file at `.circleci/config.yml` in your repo with the following content. Use the Parameters section above to decide which options work for your Terraform setup. The following example uses `tfdir` and `tfflags` so it would be the equivalent of running `terraform -var-file=myvars.tfvars` inside the directory with the terraform code.
+2. Create a new file at `.circleci/config.yml` in your repo with the following content. Use the Parameters section above to decide which options work for your Terraform setup. The following example uses `terraform_dir` and `terraform_plan_flags` so it would be the equivalent of running `terraform -var-file=myvars.tfvars` inside the directory with the terraform code.
 
   ```
   version: 2.1
@@ -86,8 +86,8 @@ For all other users, the following is needed so Terraform can run `init`:
     main:
       jobs:
         - infracost/infracost:
-            tfdir: path/to/code
-            tfflags: -var-file=myvars.tfvars
+            terraform_dir: path/to/code
+            terraform_plan_flags: -var-file=myvars.tfvars
   ```
 
 ## Contributing

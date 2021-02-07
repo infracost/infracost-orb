@@ -8,23 +8,23 @@ jobs:
     docker:
       - image: infracost/infracost:latest
     parameters:
-      tfjson:
+      terraform_json_file:
         description: Path to Terraform plan JSON file.
         default: ""
         type: string
-      tfplan:
-        description: Path to Terraform plan file relative to 'tfdir'. Requires 'tfdir' to be set.
+      terraform_plan_file:
+        description: Path to Terraform plan file relative to 'terraform_dir'. Requires 'terraform_dir' to be set.
         default: ""
         type: string
-      use_tfstate:
+      terraform_use_state:
         description: Use Terraform state instead of generating a plan.
         default: "false"
         type: string
-      tfdir:
+      terraform_dir:
         description: Path to the Terraform code directory (default is current working directory).
         default: "."
         type: string
-      tfflags:
+      terraform_plan_flags:
         description: Flags to pass to the 'terraform plan' command, e.g. `"-var-file=myvars.tfvars"`.
         default: ""
         type: string
@@ -33,7 +33,7 @@ jobs:
         default: "0"
         type: string
       pricing_api_endpoint:
-        description: Specify an alternate price list API URL (default is https://pricing.api.infracost.io).
+        description: Specify an alternate Cloud Pricing API URL (default is https://pricing.api.infracost.io).
         default: ""
         type: string
       usage_file:
@@ -41,11 +41,11 @@ jobs:
         default: ""
         type: string
     environment:
-      tfjson: << parameters.tfjson >>
-      tfplan: << parameters.tfplan >>
-      use_tfstate: << parameters.use_tfstate >>
-      tfdir: << parameters.tfdir >>
-      tfflags: << parameters.tfflags >>
+      terraform_json_file: << parameters.terraform_json_file >>
+      terraform_plan_file: << parameters.terraform_plan_file >>
+      terraform_use_state: << parameters.terraform_use_state >>
+      terraform_dir: << parameters.terraform_dir >>
+      terraform_plan_flags: << parameters.terraform_plan_flags >>
       percentage_threshold: << parameters.percentage_threshold >>
       pricing_api_endpoint: << parameters.pricing_api_endpoint >>
       usage_file: << parameters.usage_file >>
@@ -59,10 +59,10 @@ examples:
     usage:
       version: 2.1
       orbs:
-        infracost: infracost/infracost@0.4.1
+        infracost: infracost/infracost@0.5.1
       workflows:
         main:
           jobs:
             - infracost/infracost:
-                tfdir: path/to/code
-                tfflags: -var-file=myvars.tfvars
+                terraform_dir: path/to/code
+                terraform_plan_flags: -var-file=myvars.tfvars
