@@ -59,7 +59,7 @@ examples:
     usage:
       version: 2.1
       orbs:
-        infracost: infracost/infracost@0.5.1
+        infracost: infracost/infracost@0.5.0
       workflows:
         main:
           jobs:
