@@ -81,7 +81,7 @@ For all other users, the following is needed so Terraform can run `init`:
   ```
   version: 2.1
   orbs:
-    infracost: infracost/infracost@0.4.0
+    infracost: infracost/infracost@0.5.0
   workflows:
     main:
       jobs:
