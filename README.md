@@ -1,6 +1,6 @@
 # Infracost CircleCI Orb
 
-This [CircleCI Orb](https://circleci.com/developer/orbs/orb/infracost/infracost) runs [Infracost](https://infracost.io) against the master branch and the pull request. It automatically adds a pull request comment showing the cost estimate difference (similar to `git diff`) if a percentage threshold is crossed. See [this repo](https://github.com/infracost/circleci-github-demo) for a demo of the Orb being used with GitHub, and [this repo](https://bitbucket.org/infracost/circleci-bitbucket-demo) for a demo of it being used with Bitbucket.
+This [CircleCI Orb](https://circleci.com/developer/orbs/orb/infracost/infracost) runs [Infracost](https://infracost.io) against pull requests whenever Terraform files change. It automatically adds a pull request comment showing the cost estimate difference for the planned state if a percentage threshold is crossed. See [this repo](https://github.com/infracost/circleci-github-demo) for a demo of the Orb being used with GitHub, and [this repo](https://bitbucket.org/infracost/circleci-bitbucket-demo) for a demo of it being used with Bitbucket.
 
 Since Bitbucket [does not](https://community.atlassian.com/t5/Bitbucket-questions/View-all-comments-on-a-pull-request/qaq-p/677092) show commit comments in the pull request page, the Orb posts a pull request comment if applicable; otherwise it posts a commit comment (only visible in the commit's comments page). If possible, we recommend Bitbucket users to select the "Only build pull requests" option in CircleCI's Project > Advanced settings to get the pull request comments.
 
@@ -12,27 +12,25 @@ As mentioned in the [FAQ](https://www.infracost.io/docs/faq), you can run Infrac
 
 ## Parameters
 
-Infracost should be run using the [Terraform directory method](https://www.infracost.io/docs/#1-terraform-directory) with this CircleCI Orb. Once [this issue](https://github.com/infracost/infracost/issues/99) is released, we'll be able to support other methods.
+### `path`
 
-### `terraform_dir`
-
-**Optional** Path to the Terraform code directory (default is current working directory).
+**Optional** Path to the Terraform directory or JSON/plan file. Either `path` or `config_file` is required.
 
 ### `terraform_plan_flags`
 
-**Optional** Flags to pass to the 'terraform plan' command, e.g. `"-var-file=myvars.tfvars -var-file=othervars.tfvars"`.
+**Optional** Flags to pass to the 'terraform plan' command, e.g. `"-var-file=my.tfvars -var-file=other.tfvars"`. Applicable when path is a Terraform directory.
 
 ### `usage_file`
 
-**Optional** Path to Infracost [usage file](https://www.infracost.io/docs/usage_based_resources#infracost-usage-file) that specifies values for usage-based resources, see [this example file](https://github.com/infracost/infracost/blob/master/infracost-usage-example.yml) for the available options. The file should be present in the master/main branch too.
+**Optional** Path to Infracost [usage file](https://www.infracost.io/docs/usage_based_resources#infracost-usage-file) that specifies values for usage-based resources, see [this example file](https://github.com/infracost/infracost/blob/master/infracost-usage-example.yml) for the available options.
+
+### `config_file`
+
+**Optional** Path to the Infracost [config file](https://www.infracost.io/docs/config_file/). Cannot be used with path, terraform* or usage-file flags. See [this example file](https://github.com/infracost/infracost/blob/master/infracost-example.yml) for the available options.
 
 ### `percentage_threshold`
 
-**Optional** The absolute percentage threshold that triggers a pull request comment with the diff. Defaults to 0, meaning that a comment is posted if the cost estimate changes. For example, set to 5 to post a comment if the cost estimate changes by plus or minus 5%.
-
-### `pricing_api_endpoint`
-
-**Optional** Specify an alternate Cloud Pricing API URL (default is https://pricing.api.infracost.io).
+**Optional** The absolute percentage threshold that triggers a pull request comment with the diff. Defaults to 0, meaning that a comment is posted if the cost estimate changes. For example, set to 5 to post a comment if the cost estimate changes by more than plus or minus 5%.
 
 ## Environment variables
 
@@ -62,7 +60,7 @@ For all other users, the following is needed so Terraform can run `init`:
 
 ### `INFRACOST_TERRAFORM_BINARY`
 
-**Optional** Used to change the path to the terraform binary or version, see [here](https://www.infracost.io/docs/environment_variables/#cicd-integrations) for the available options.
+**Optional** Used to change the path to the `terraform binary` or version, see [here](https://www.infracost.io/docs/environment_variables/#cicd-integrations) for the available options.
 
 ### `GIT_SSH_KEY`
 
@@ -76,7 +74,7 @@ For all other users, the following is needed so Terraform can run `init`:
 
 1. In CircleCI, go to your Project Settings > Environment Variables, and add environment variables for `INFRACOST_API_KEY`, either `GITHUB_TOKEN` or `BITBUCKET_TOKEN`, and any other required credentials (e.g. `AWS_ACCESS_KEY_ID`).
 
-2. Create a new file at `.circleci/config.yml` in your repo with the following content. Use the Parameters section above to decide which options work for your Terraform setup. The following example uses `terraform_dir` and `terraform_plan_flags` so it would be the equivalent of running `terraform -var-file=myvars.tfvars` inside the directory with the terraform code.
+2. Create a new file at `.circleci/config.yml` in your repo with the following content. Use the Parameters section above to decide which options work for your Terraform setup. The following example uses `path` to specify the location of the Terraform directory and `terraform_plan_flags` to specify the variables file to use when running `terraform plan`.
 
   ```
   version: 2.1
@@ -86,8 +84,8 @@ For all other users, the following is needed so Terraform can run `init`:
     main:
       jobs:
         - infracost/infracost:
-            terraform_dir: path/to/code
-            terraform_plan_flags: -var-file=myvars.tfvars
+            path: path/to/code
+            terraform_plan_flags: -var-file=my.tfvars
   ```
 
 ## Contributing
