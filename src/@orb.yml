@@ -18,7 +18,7 @@ jobs:
         type: string
       terraform_workspace:
         description: The Terraform workspace to use. Applicable when path is a Terraform directory.
-        default: "" 
+        default: ""
         type: string
       usage_file:
         description: Path to Infracost usage file that specifies values for usage-based resources.
