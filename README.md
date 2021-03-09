@@ -1,12 +1,12 @@
 # Infracost CircleCI Orb
 
-This [CircleCI Orb](https://circleci.com/developer/orbs/orb/infracost/infracost) runs [Infracost](https://infracost.io) against pull requests whenever Terraform files change. It automatically adds a pull request comment showing the cost estimate difference for the planned state if a percentage threshold is crossed. See [this repo](https://github.com/infracost/circleci-github-demo) for a demo of the Orb being used with GitHub, and [this repo](https://bitbucket.org/infracost/circleci-bitbucket-demo) for a demo of it being used with Bitbucket.
+[This CircleCI Orb](https://circleci.com/developer/orbs/orb/infracost/infracost) runs [Infracost](https://infracost.io) against pull requests and automatically adds a pull request comment showing the cost estimate difference for the planned state if a percentage threshold is crossed. See [this repo](https://github.com/infracost/circleci-github-demo) for a demo of the Orb being used with GitHub, and [this repo](https://bitbucket.org/infracost/circleci-bitbucket-demo) for a demo of it being used with Bitbucket.
 
 Since Bitbucket [does not](https://community.atlassian.com/t5/Bitbucket-questions/View-all-comments-on-a-pull-request/qaq-p/677092) show commit comments in the pull request page, the Orb posts a pull request comment if applicable; otherwise it posts a commit comment (only visible in the commit's comments page). If possible, we recommend Bitbucket users to select the "Only build pull requests" option in CircleCI's Project > Advanced settings to get the pull request comments.
 
 The Orb uses the latest version of Infracost by default as we regularly add support for more cloud resources. If you run into any issues, please join our [community Slack channel](https://www.infracost.io/community-chat); we'd be happy to guide you through it.
 
-As mentioned in the [FAQ](https://www.infracost.io/docs/faq), you can run Infracost in your Terraform directories without worrying about security or privacy issues as no cloud credentials, secrets, tags or Terraform resource identifiers are sent to the open-source [Cloud Pricing API](https://github.com/infracost/cloud-pricing-api). Infracost does not make any changes to your Terraform state or cloud resources.
+As mentioned in the [FAQ](https://www.infracost.io/docs/faq), **no** cloud credentials, secrets, tags or resource identifiers are sent to the Cloud Pricing API. That API does not become aware of your cloud spend; it simply returns cloud prices to the CLI so calculations can be done on your machine. Infracost does not make any changes to your Terraform state or cloud resources.
 
 <img src="screenshot.png" width=557 alt="Example screenshot" />
 
@@ -20,13 +20,17 @@ As mentioned in the [FAQ](https://www.infracost.io/docs/faq), you can run Infrac
 
 **Optional** Flags to pass to the 'terraform plan' command, e.g. `"-var-file=my.tfvars -var-file=other.tfvars"`. Applicable when path is a Terraform directory.
 
+### `terraform_workspace`
+
+**Optional** The Terraform workspace to use. Applicable when path is a Terraform directory. Only set this for multi-workspace deployments, otherwise it might result in the Terraform error "workspaces not supported".
+
 ### `usage_file`
 
 **Optional** Path to Infracost [usage file](https://www.infracost.io/docs/usage_based_resources#infracost-usage-file) that specifies values for usage-based resources, see [this example file](https://github.com/infracost/infracost/blob/master/infracost-usage-example.yml) for the available options.
 
 ### `config_file`
 
-**Optional** Path to the Infracost [config file](https://www.infracost.io/docs/config_file/). Cannot be used with path, terraform* or usage-file flags. See [this example file](https://github.com/infracost/infracost/blob/master/infracost-example.yml) for the available options.
+**Optional** If your repo has **multiple Terraform projects or workspaces**, define them in a [config file](https://www.infracost.io/docs/config_file/) and set this input to its path. Their results will be combined into the same diff output. Cannot be used with path, terraform_plan_flags or usage_file inputs. 
 
 ### `percentage_threshold`
 
@@ -34,9 +38,9 @@ As mentioned in the [FAQ](https://www.infracost.io/docs/faq), you can run Infrac
 
 ## Environment variables
 
-The following environment variables are required. Other supported environment variables are described in the [Infracost docs](https://www.infracost.io/docs/environment_variables).
+This section describes the required environment variables. Other supported environment variables are described in the [this page](https://www.infracost.io/docs/integrations/environment_variables).
 
-Terragrunt users should follow [this section](https://www.infracost.io/docs/terragrunt).
+Terragrunt users should also read [this page](https://www.infracost.io/docs/iac_tools/terragrunt). Terraform Cloud/Enterprise users should also read [this page](https://www.infracost.io/docs/iac_tools/terraform_cloud_enterprise).
 
 ### `INFRACOST_API_KEY`
 
@@ -52,7 +56,7 @@ Terragrunt users should follow [this section](https://www.infracost.io/docs/terr
 
 ### Cloud credentials
 
-**Required** You do not need to set cloud credentials if you use Terraform Cloud/Enterprise's remote execution mode, instead you should follow [this section](https://www.infracost.io/docs/terraform_cloud_enterprise).
+**Required** You do not need to set cloud credentials if you use Terraform Cloud/Enterprise's remote execution mode, instead you should follow [this page](https://www.infracost.io/docs/iac_tools/terraform_cloud_enterprise).
 
 For all other users, the following is needed so Terraform can run `init`:
 - AWS users should set `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
@@ -60,15 +64,11 @@ For all other users, the following is needed so Terraform can run `init`:
 
 ### `INFRACOST_TERRAFORM_BINARY`
 
-**Optional** Used to change the path to the `terraform binary` or version, see [here](https://www.infracost.io/docs/environment_variables/#cicd-integrations) for the available options.
+**Optional** Used to change the path to the `terraform` binary or version, see [this page](https://www.infracost.io/docs/integrations/environment_variables/#cicd-integrations) for the available options.
 
 ### `GIT_SSH_KEY`
 
-**Optional** If you're using terraform modules from private Git repositories you can set this environment variable to your private Git SSH key so terraform can access your module.
-
-### `BITBUCKET_API_URL`
-
-**Optional** Bitbucket API URL, defaults to https://api.bitbucket.org.
+**Optional** If you're using Terraform modules from private Git repositories you can set this environment variable to your private Git SSH key so Terraform can access your module.
 
 ## Usage
 
@@ -79,7 +79,7 @@ For all other users, the following is needed so Terraform can run `init`:
   ```
   version: 2.1
   orbs:
-    infracost: infracost/infracost@0.5.0
+    infracost: infracost/infracost@0.6.0
   workflows:
     main:
       jobs:
@@ -87,6 +87,8 @@ For all other users, the following is needed so Terraform can run `init`:
             path: path/to/code
             terraform_plan_flags: -var-file=my.tfvars
   ```
+
+3. Send a new pull request to change something in Terraform that costs money; a comment should be posted on the pull request. Check the CircleCI logs and [this page](https://www.infracost.io/docs/integrations/cicd#cicd-troubleshooting) if there are issues.
 
 ## Contributing
 
