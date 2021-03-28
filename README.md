@@ -88,6 +88,16 @@ For all other users, the following is needed so Terraform can run `init`:
             terraform_plan_flags: -var-file=my.tfvars
   ```
 
+  If you already run Terraform commands and generate a plan JSON before using the Infracost Orb, you can use Orb `pre-steps` to `attach_workspace` so the Infracost Orb has access to the plan JSON file, e.g.:
+  ```
+  jobs:
+    - infracost/infracost:
+        pre-steps:
+          - attach_workspace:
+              at: /workspace/.terraform
+        path: /workspace/.terraform/tfplan.json
+  ```
+
 3. Send a new pull request to change something in Terraform that costs money; a comment should be posted on the pull request. Check the CircleCI logs and [this page](https://www.infracost.io/docs/integrations/cicd#cicd-troubleshooting) if there are issues.
 
 ## Contributing
