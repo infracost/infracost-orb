@@ -1,6 +1,6 @@
 # Infracost CircleCI Orb
 
-[This CircleCI Orb](https://circleci.com/developer/orbs/orb/infracost/infracost) runs [Infracost](https://infracost.io) against pull requests and automatically adds a pull request comment showing the cost estimate difference for the planned state if a percentage threshold is crossed. See [this repo](https://github.com/infracost/circleci-github-demo) for a demo of the Orb being used with GitHub, and [this repo](https://bitbucket.org/infracost/circleci-bitbucket-demo) for a demo of it being used with Bitbucket.
+[This CircleCI Orb](https://circleci.com/developer/orbs/orb/infracost/infracost) runs [Infracost](https://infracost.io) against pull requests and automatically adds a pull request comment showing the cost estimate difference for the planned state. See [this repo](https://github.com/infracost/circleci-github-demo) for a demo of the Orb being used with GitHub, and [this repo](https://bitbucket.org/infracost/circleci-bitbucket-demo) for a demo of it being used with Bitbucket.
 
 Since Bitbucket [does not](https://community.atlassian.com/t5/Bitbucket-questions/View-all-comments-on-a-pull-request/qaq-p/677092) show commit comments in the pull request page, the Orb posts a pull request comment if applicable; otherwise it posts a commit comment (only visible in the commit's comments page). If possible, we recommend Bitbucket users to select the "Only build pull requests" option in CircleCI's Project > Advanced settings to get the pull request comments.
 
@@ -32,9 +32,12 @@ As mentioned in the [FAQ](https://www.infracost.io/docs/faq), **no** cloud crede
 
 **Optional** If your repo has **multiple Terraform projects or workspaces**, define them in a [config file](https://www.infracost.io/docs/config_file/) and set this input to its path. Their results will be combined into the same diff output. Cannot be used with path, terraform_plan_flags or usage_file inputs. 
 
-### `percentage_threshold`
+### `post_condition`
 
-**Optional** The absolute percentage threshold that triggers a pull request comment with the diff. Defaults to 0, meaning that a comment is posted if the cost estimate changes. For example, set to 5 to post a comment if the cost estimate changes by more than plus or minus 5%.
+**Optional** A JSON string describing the condition that triggers pull request comments, can be one of these:
+- `'{"has_diff": true}'`: only post a comment if there is a diff. This is the default behavior.
+- `'{"always": true}'`: always post a comment.
+- `'{"percentage_threshold": 0}'`: absolute percentage threshold that triggers a comment. For example, set to 1 to post a comment if the cost estimate changes by more than plus or minus 1%.
 
 ## Environment variables
 
@@ -79,7 +82,7 @@ For all other users, the following is needed so Terraform can run `init`:
   ```
   version: 2.1
   orbs:
-    infracost: infracost/infracost@0.6.0
+    infracost: infracost/infracost@0.7.0
   workflows:
     main:
       jobs:
