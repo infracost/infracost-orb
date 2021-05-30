@@ -6,9 +6,47 @@ Since Bitbucket [does not](https://community.atlassian.com/t5/Bitbucket-question
 
 The Orb uses the latest version of Infracost by default as we regularly add support for more cloud resources. If you run into any issues, please join our [community Slack channel](https://www.infracost.io/community-chat); we'd be happy to guide you through it.
 
-As mentioned in the [FAQ](https://www.infracost.io/docs/faq), **no** cloud credentials, secrets, tags or resource identifiers are sent to the Cloud Pricing API. That API does not become aware of your cloud spend; it simply returns cloud prices to the CLI so calculations can be done on your machine. Infracost does not make any changes to your Terraform state or cloud resources.
+As mentioned in our [FAQ](https://infracost.io/docs/faq), no cloud credentials or secrets are sent to the Cloud Pricing API. Infracost does not make any changes to your Terraform state or cloud resources.
 
 <img src="screenshot.png" width=557 alt="Example screenshot" />
+
+## Table of Contents
+
+* [Usage](#usage)
+* [Parameters](#parameters)
+* [Environment variables](#environment-variables)
+* [Contributing](#contributing)
+
+# Usage
+
+1. In CircleCI, go to your Project Settings > Environment Variables, and add environment variables for `INFRACOST_API_KEY`, either `GITHUB_TOKEN` or `BITBUCKET_TOKEN`, and any other required credentials (e.g. `AWS_ACCESS_KEY_ID`).
+
+2. Create a new file at `.circleci/config.yml` in your repo with the following content. Use the Parameters section above to decide which options work for your Terraform setup. The following example uses `path` to specify the location of the Terraform directory and `terraform_plan_flags` to specify the variables file to use when running `terraform plan`.
+
+    ```
+    version: 2.1
+    orbs:
+      infracost: infracost/infracost@0.7.0
+    workflows:
+      main:
+        jobs:
+          - infracost/infracost:
+              path: path/to/code
+              terraform_plan_flags: -var-file=my.tfvars
+    ```
+
+    If you already run Terraform commands and generate a plan JSON before using the Infracost Orb, you can use Orb `pre-steps` to `attach_workspace` so the Infracost Orb has access to the plan JSON file, e.g.:
+
+    ```
+    jobs:
+      - infracost/infracost:
+          pre-steps:
+            - attach_workspace:
+                at: /workspace/.terraform
+          path: /workspace/.terraform/tfplan.json
+    ```
+
+3. Send a new pull request to change something in Terraform that costs money; a comment should be posted on the pull request. Check the CircleCI logs and [this page](https://www.infracost.io/docs/integrations/cicd#cicd-troubleshooting) if there are issues.
 
 ## Parameters
 
@@ -41,13 +79,13 @@ As mentioned in the [FAQ](https://www.infracost.io/docs/faq), **no** cloud crede
 
 ## Environment variables
 
-This section describes the required environment variables. Other supported environment variables are described in the [this page](https://www.infracost.io/docs/integrations/environment_variables).
+This section describes the main environment variables. Other supported environment variables are described in the [this page](https://www.infracost.io/docs/integrations/environment_variables).
 
 Terragrunt users should also read [this page](https://www.infracost.io/docs/iac_tools/terragrunt). Terraform Cloud/Enterprise users should also read [this page](https://www.infracost.io/docs/iac_tools/terraform_cloud_enterprise).
 
 ### `INFRACOST_API_KEY`
 
-**Required** To get an API key [download Infracost](https://www.infracost.io/docs/#installation) and run `infracost register`.
+**Required** To get an API key [download Infracost](https://www.infracost.io/docs/#quick-start) and run `infracost register`.
 
 ### `GITHUB_TOKEN`
 
@@ -73,39 +111,9 @@ For all other users, the following is needed so Terraform can run `init`:
 
 **Optional** If you're using Terraform modules from private Git repositories you can set this environment variable to your private Git SSH key so Terraform can access your module.
 
-## Usage
-
-1. In CircleCI, go to your Project Settings > Environment Variables, and add environment variables for `INFRACOST_API_KEY`, either `GITHUB_TOKEN` or `BITBUCKET_TOKEN`, and any other required credentials (e.g. `AWS_ACCESS_KEY_ID`).
-
-2. Create a new file at `.circleci/config.yml` in your repo with the following content. Use the Parameters section above to decide which options work for your Terraform setup. The following example uses `path` to specify the location of the Terraform directory and `terraform_plan_flags` to specify the variables file to use when running `terraform plan`.
-
-  ```
-  version: 2.1
-  orbs:
-    infracost: infracost/infracost@0.7.0
-  workflows:
-    main:
-      jobs:
-        - infracost/infracost:
-            path: path/to/code
-            terraform_plan_flags: -var-file=my.tfvars
-  ```
-
-  If you already run Terraform commands and generate a plan JSON before using the Infracost Orb, you can use Orb `pre-steps` to `attach_workspace` so the Infracost Orb has access to the plan JSON file, e.g.:
-  ```
-  jobs:
-    - infracost/infracost:
-        pre-steps:
-          - attach_workspace:
-              at: /workspace/.terraform
-        path: /workspace/.terraform/tfplan.json
-  ```
-
-3. Send a new pull request to change something in Terraform that costs money; a comment should be posted on the pull request. Check the CircleCI logs and [this page](https://www.infracost.io/docs/integrations/cicd#cicd-troubleshooting) if there are issues.
-
 ## Contributing
 
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+Issues and pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 ## Publishing
 
