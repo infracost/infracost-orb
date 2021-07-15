@@ -26,7 +26,7 @@ As mentioned in our [FAQ](https://infracost.io/docs/faq), no cloud credentials o
     ```
     version: 2.1
     orbs:
-      infracost: infracost/infracost@0.7.0
+      infracost: infracost/infracost@0.8.1
     workflows:
       main:
         jobs:
@@ -72,7 +72,7 @@ As mentioned in our [FAQ](https://infracost.io/docs/faq), no cloud credentials o
 
 ### `show_skipped`
 
-**Optional** Show unsupported resources, some of which might be free, at the bottom of the Infracost output (default is false).
+**Optional** Show unsupported resources, some of which might be free, at the bottom of the Infracost output (use a string value, either "true" or "false", default is "false").
 
 ### `post_condition`
 
