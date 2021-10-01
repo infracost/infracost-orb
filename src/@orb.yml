@@ -6,7 +6,7 @@ display:
 jobs:
   infracost:
     docker:
-      - image: infracost/infracost:latest
+      - image: infracost/infracost:test
     parameters:
       path:
         description: Path to the Terraform directory or JSON/plan file. Either `path` or `config_file` is required.
