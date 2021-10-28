@@ -41,6 +41,10 @@ jobs:
         description: Show unsupported resources, some of which might be free, at the bottom of the Infracost output.
         default: "false"
         type: string
+      sync_usage_file:
+        description: Sync usage-file with missing resources. This requires the usage_file input to be set.
+        default: "false"
+        type: string
     environment:
       path: << parameters.path >>
       terraform_plan_flags: << parameters.terraform_plan_flags >>
@@ -49,6 +53,7 @@ jobs:
       config_file: << parameters.config_file >>
       post_condition: << parameters.post_condition >>
       show_skipped: << parameters.show_skipped >>
+      sync_usage_file: << parameters.sync_usage_file >>
     steps:
       - checkout
       - run: /scripts/ci/diff.sh
