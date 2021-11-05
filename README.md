@@ -111,7 +111,7 @@ Terragrunt users should also read [this page](https://www.infracost.io/docs/iac_
 **Required** You do not need to set cloud credentials if you use Terraform Cloud/Enterprise's remote execution mode, instead you should follow [this page](https://www.infracost.io/docs/iac_tools/terraform_cloud_enterprise).
 
 For all other users, the following is needed so Terraform can run `init`:
-- AWS users should set `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
+- AWS users should set `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`, or read [this section](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#environment-variables) of the Terraform docs for other options. If your Terraform project uses multiple AWS credentials you can configure them using the [Infracost config file](https://www.infracost.io/docs/multi_project/config_file/#examples). We have an example of [how this works with GitHub actions here](https://github.com/infracost/infracost-gh-action#multiple-aws-credentials).
 - GCP users should set `GOOGLE_CREDENTIALS` or read [this section](https://registry.terraform.io/providers/hashicorp/google/latest/docs/guides/provider_reference#full-reference) of the Terraform docs for other options.
 
 ### `INFRACOST_TERRAFORM_BINARY`
