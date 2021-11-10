@@ -26,7 +26,7 @@ As mentioned in our [FAQ](https://infracost.io/docs/faq), no cloud credentials o
     ```
     version: 2.1
     orbs:
-      infracost: infracost/infracost@0.8.2
+      infracost: infracost/infracost@0.8.4
     workflows:
       main:
         jobs:
