@@ -38,7 +38,7 @@ jobs:
         default: ''
         type: string
       show_skipped:
-        description: Show unsupported resources, some of which might be free, at the bottom of the Infracost output.
+        description: Show unsupported resources, at the bottom of the Infracost output.
         default: "false"
         type: string
       sync_usage_file:
