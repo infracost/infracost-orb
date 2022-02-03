@@ -100,7 +100,7 @@ Terragrunt users should also read [this page](https://www.infracost.io/docs/iac_
 
 ### `GITHUB_TOKEN`
 
-**Optional** GitHub token used to post comments (e.g. a Personal access token), needs to have `repo` scope so it can post comments.
+**Optional** GitHub token used to post comments (e.g. a Personal access token), needs to have `repo` scope so it can post comments. If you are using SAML single sign-on, you must first [authorize the token](https://docs.github.com/en/enterprise-cloud@latest/authentication/authenticating-with-saml-single-sign-on/authorizing-a-personal-access-token-for-use-with-saml-single-sign-on).
 
 ### `BITBUCKET_TOKEN`
 
