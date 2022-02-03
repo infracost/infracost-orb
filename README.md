@@ -46,7 +46,7 @@ As mentioned in our [FAQ](https://infracost.io/docs/faq), no cloud credentials o
           path: /workspace/.terraform/tfplan.json
     ```
 
-3. Send a new pull request to change something in Terraform that costs money; a comment should be posted on the pull request. Check the CircleCI logs and [this page](https://www.infracost.io/docs/integrations/cicd#cicd-troubleshooting) if there are issues.
+3. Send a new pull request to change something in Terraform that costs money; a comment should be posted on the pull request. Check the CircleCI logs and [this page](https://www.infracost.io/docs/troubleshooting/) if there are issues.
 
 ## Parameters
 
