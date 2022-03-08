@@ -1,6 +1,12 @@
-# Infracost CircleCI Orb
+# Old Infracost CircleCI Orb
 
-👉👉👉 We haven't updated this repo to use the new `infracost comment` command yet (we'll get to it soon). We recommend you follow [these instructions](https://www.infracost.io/docs/integrations/cicd/#my-cicd-system-isnt-supported) if you'd like to see cost estimate comments in pull requests.
+## Deprecation notice
+
+👉 Use our new [Infracost CircleCI integration](https://github.com/infracost/infracost-circleci) instead! 👈
+
+⚠️ This repo will be deprecated in the next Infracost release. ⚠️
+
+We recommend everyone uses the new integration to use the Infracost Docker image directly..
 
 --- 
 
