@@ -106,7 +106,7 @@ Terragrunt users should also read [this page](https://www.infracost.io/docs/iac_
 
 ### `INFRACOST_API_KEY`
 
-**Required** To get an API key [download Infracost](https://www.infracost.io/docs/#quick-start) and run `infracost register`.
+**Required** To get an API key [download Infracost](https://www.infracost.io/docs/#quick-start) and run `infracost auth login`.
 
 ### `GITHUB_TOKEN`
 
